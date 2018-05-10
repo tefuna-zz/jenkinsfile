@@ -1,12 +1,12 @@
 #!groovy
 // --------------------------------------------------------
-//  btobmembership: test.jenkinsfile
+//  shceagger: build.jenkinsfile
 // --------------------------------------------------------
 // import.
 import java.text.SimpleDateFormat
 
 // library load.
-@Library('common@1.0') _
+@Library('common@master') _
 
 // pipeline main.
 pipeline {
@@ -28,7 +28,7 @@ pipeline {
         stage('init') {
             steps {
                 sh "echo +++++++++++++++++++++init"
-                notificationBuild("start build.", ARTIFACTS_DIR)
+//                notificationBuild("start build.")
                 deleteDir()
                 // git() 
             }
@@ -38,12 +38,12 @@ pipeline {
             parallel {
                 stage('tfn-common') {
                     steps {
-                        git('tfn-common')
+                        checkoutGit('tfn-common', 'master')
                     }
                 }
-                stage('scheaggr-master') {
+                stage('scheaggr-api-master') {
                     steps {
-                        git('scheaggr-master')
+                        checkoutGit('scheaggr-api-master', 'master')
                     }
                 }
             }
@@ -64,7 +64,10 @@ pipeline {
 
         stage('build') {
             agent {
-                docker 'openjdk:8u131-jdk'
+                docker {
+                    image 'openjdk:8u131-jdk' 
+                    reuseNode true 
+                } 
             }
             steps {
                 sh 'java -version'
