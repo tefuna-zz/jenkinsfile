@@ -1,0 +1,77 @@
+#!groovy
+// --------------------------------------------------------
+//  btobmembership: test.jenkinsfile
+// --------------------------------------------------------
+// import.
+import java.text.SimpleDateFormat
+
+// library load.
+@Library('common@1.0') _
+
+// pipeline main.
+pipeline {
+
+    // global settings. 
+    agent any
+    environment {
+        AAA = 'aaa'
+    }
+
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '10'))
+        timeout(time: 2, unit: 'HOURS')
+        skipStagesAfterUnstable()
+        timestamps()
+    }
+
+    stages() {
+        stage('init') {
+            steps {
+                sh "echo +++++++++++++++++++++init"
+                notificationBuild("start build.", ARTIFACTS_DIR)
+                deleteDir()
+                // git() 
+            }
+        }
+
+        stage('checkout') {
+            parallel {
+                stage('tfn-common') {
+                    steps {
+                        git('tfn-common')
+                    }
+                }
+                stage('scheaggr-master') {
+                    steps {
+                        git('scheaggr-master')
+                    }
+                }
+            }
+
+            // steps() {
+            //     dir ('tfn-common') {
+            //         git changelog: false, credentialsId: 'github', poll: false, url: 'https://github.com/tefuna/tfn-common.git'
+            //     }
+            //     dir ('scheaggr-api-master') {
+            //         git changelog: false, credentialsId: 'github', poll: false, url: 'https://github.com/tefuna/scheaggr-api-master.git'
+            //     }
+            //     sh 'java -version'
+            //     dir ('scheaggr-api-master') {
+            //         sh 'chmod 744 gradlew && ./gradlew --info clean jar'
+            //     }
+            // }
+        }
+
+        stage('build') {
+            agent {
+                docker 'openjdk:8u131-jdk'
+            }
+            steps {
+                sh 'java -version'
+                dir ('scheaggr-api-master') {
+                    sh 'chmod 744 gradlew && ./gradlew --info clean jar'
+                }
+            }
+        }
+    }
+}

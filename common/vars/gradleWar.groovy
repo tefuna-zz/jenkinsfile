@@ -3,8 +3,8 @@
 /**
  * gradleタスクでwarファイルを生成します。
  */
-def call(TARGET) {
-    dir (TARGET) { 
-        sh './gradlew --info clean war'
+def call(target) {
+    dir (target) { 
+        sh 'chmod 744 gradlew && ./gradlew --info clean jar'
     }
 }
