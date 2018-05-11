@@ -38,28 +38,15 @@ pipeline {
             parallel {
                 stage('tfn-common') {
                     steps {
-                        checkoutGit('tfn-common', 'master')
+                        git('tfn-common', 'master')
                     }
                 }
                 stage('scheaggr-api-master') {
                     steps {
-                        checkoutGit('scheaggr-api-master', 'master')
+                        git('scheaggr-api-master', 'master')
                     }
                 }
             }
-
-            // steps() {
-            //     dir ('tfn-common') {
-            //         git changelog: false, credentialsId: 'github', poll: false, url: 'https://github.com/tefuna/tfn-common.git'
-            //     }
-            //     dir ('scheaggr-api-master') {
-            //         git changelog: false, credentialsId: 'github', poll: false, url: 'https://github.com/tefuna/scheaggr-api-master.git'
-            //     }
-            //     sh 'java -version'
-            //     dir ('scheaggr-api-master') {
-            //         sh 'chmod 744 gradlew && ./gradlew --info clean jar'
-            //     }
-            // }
         }
 
         stage('build') {
